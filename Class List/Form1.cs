@@ -13,6 +13,7 @@ using System.Drawing.Printing;
 using System.Security;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
+using System.Windows.Documents;
 
 namespace Class_List
 {
@@ -105,8 +106,8 @@ namespace Class_List
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
-          ///mail_Client emc = new Email_Client();
-           //mc.Show();
+            ///mail_Client emc = new Email_Client();
+            //mc.Show();
         }
 
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
@@ -124,8 +125,51 @@ namespace Class_List
             var random = new Random();
 
             int index = random.Next(0, listBox1.Items.Count);
-            MessageBox.Show (listBox1.Items[index].ToString());
+            MessageBox.Show(listBox1.Items[index].ToString());
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText((string)listBox1.SelectedItem);
+        }
+
+        private void cutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText((string)listBox1.SelectedItem);
+
+            listBox1.Items.Remove(listBox1.SelectedItem);
+        }
+
+        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            string s = Clipboard.GetText();
+            string[] lines = s.Split('\n');
+            foreach (string ln in lines)
+            {
+                listBox1.Items.Add(ln.Trim());
+            }
+        }
+
+        private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                listBox1.SelectedItems.Clear();
+                for (int i = 0; i < listBox1.Items.Count; i++)
+                {
+                    listBox1.SetSelected(i, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            listBox1.Items.Remove(listBox1.SelectedItem);
         }
     }
 }
-
