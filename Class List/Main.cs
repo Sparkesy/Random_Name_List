@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Net.Mail;
-using System.IO;
 using System.Drawing.Printing;
-using System.Security;
-using System.Security.Cryptography;
-using System.Runtime.InteropServices;
-using System.Windows.Documents;
+using System.IO;
+using System.Net.Mail;
+using System.Windows.Forms;
 
 namespace Class_List
 {
-    public partial class Form1 : Form
+    public partial class Main : Form
     {
-        public Form1()
+        public Main()
         {
             InitializeComponent();
         }
@@ -29,7 +18,7 @@ namespace Class_List
             Environment.Exit(0);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        public void button2_Click(object sender, EventArgs e)
         {
             // grab the value supplied
             string newstudent = txtbxStudentName.Text;
@@ -106,27 +95,22 @@ namespace Class_List
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
-            ///mail_Client emc = new Email_Client();
-            //mc.Show();
+            //open email send box with contents of name list
+            MailMessage mail = new MailMessage();
+            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+            mail.From = new MailAddress("your email address");
+            mail.To.Add("recipient email address");
+            mail.Subject = "Class List";
+            mail.Body = listBox1.Items.ToString();
+            SmtpServer.Port = 587;
+            SmtpServer.Credentials = new System.Net.NetworkCredential("your email address", "your password");
+            SmtpServer.EnableSsl = true;
+            SmtpServer.Send(mail);
+            MessageBox.Show("mail Send");
+
         }
 
-        private void toolStripMenuItem3_Click(object sender, EventArgs e)
-        {
 
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void randomNameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var random = new Random();
-
-            int index = random.Next(0, listBox1.Items.Count);
-            MessageBox.Show(listBox1.Items[index].ToString());
-        }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -167,9 +151,65 @@ namespace Class_List
             }
         }
 
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        public void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             listBox1.Items.Remove(listBox1.SelectedItem);
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            // print list box contents
+            PrintDocument pd = new PrintDocument();
+            pd.Print();
+            //print dialog box
+            PrintDialog printDialog = new PrintDialog();
+            printDialog.Document = pd;
+            printDialog.UseEXDialog = true;
+            if (DialogResult.OK == printDialog.ShowDialog())
+            {
+                pd.Print();
+            }
+
+        }
+
+        private void randomNameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // popup with random name chosen from list in a try and catch block to ensure the list is not empty
+            try
+            {
+                Random rnd = new Random();
+                int index = rnd.Next(listBox1.Items.Count);
+                MessageBox.Show(listBox1.Items[index].ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            // open file dialog box
+            try
+            {
+                OpenFileDialog openfile = new OpenFileDialog();
+                openfile.Filter = "Text (*.txt)|*.txt ";
+                if (openfile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    using (var Reminder = new StreamReader(openfile.FileName))
+                        while (!Reminder.EndOfStream)
+                            listBox1.Items.Add(Reminder.ReadLine());
+                }
+            }
+            catch (Exception ex)
+            {
+                //message shows error and explains why
+                MessageBox.Show("File is empty or in an invalid format");
+                MessageBox.Show(ex.Message);
+            }
+           
+            
         }
     }
 }
